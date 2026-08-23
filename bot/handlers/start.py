@@ -1,6 +1,13 @@
-# Start command handler
-# Handles /start command for new users
+"""Start command handler."""
+
+from bot.services.users import get_user_registry
+
 
 async def start_handler(update, context):
-    """Handle /start command."""
-    pass
+    """Register the user so admins can broadcast to them."""
+    if update.effective_user and update.effective_chat:
+        get_user_registry().register(update.effective_user, update.effective_chat.id)
+
+    await update.effective_message.reply_text(
+        "Welcome to Senrivia! Your account has been registered."
+    )
