@@ -1,32 +1,35 @@
 """Main application entry point."""
-# Application initialization and startup
 
 import logging
-from telegram.ext import Application, CommandHandler, MessageHandler, filters
-from bot.handlers import start, admin, settings, watchlist
+
+from telegram.ext import Application, CommandHandler
+
+from bot.config import get_settings
+from bot.handlers import admin, settings, start, watchlist
 
 logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    level=logging.INFO,
 )
 
 logger = logging.getLogger(__name__)
 
-async def main():
-    """Start the bot."""
-    application = Application.builder().token("YOUR_BOT_TOKEN").build()
-    
-    # Add handlers
+
+def main() -> None:
+    """Start the Telegram bot."""
+    config = get_settings()
+    config.validate()
+
+    application = Application.builder().token(config.bot_token).build()
+
     application.add_handler(CommandHandler("start", start.start_handler))
     application.add_handler(CommandHandler("admin", admin.admin_handler))
+    application.add_handler(CommandHandler("broadcast", admin.broadcast_handler))
     application.add_handler(CommandHandler("settings", settings.settings_handler))
     application.add_handler(CommandHandler("watchlist", watchlist.watchlist_handler))
-    
-    # Start the bot
-    await application.initialize()
-    await application.start()
-    await application.updater.start_polling()
 
-if __name__ == '__main__':
-    import asyncio
-    asyncio.run(main())
+    application.run_polling()
+
+
+if __name__ == "__main__":
+    main()
