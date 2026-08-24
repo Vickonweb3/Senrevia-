@@ -1,7 +1,8 @@
 import asyncio
 import os
-from telethon import TelegramClient, types
+
 from dotenv import load_dotenv
+from telethon import TelegramClient, events, types
 
 load_dotenv()
 
@@ -14,11 +15,8 @@ client = TelegramClient(SESSION, API_ID, API_HASH)
 
 def inspect_message(message):
     found = []
-    for entity in (message.entities or []):
+    for entity in message.entities or []:
         if isinstance(entity, types.MessageEntityCustomEmoji):
-            found.append(entity.document_id)
-    for entity in (message.entities or []):
-        if hasattr(entity, "document_id") and type(entity).__name__ == "MessageEntityCustomEmoji":
             if entity.document_id not in found:
                 found.append(entity.document_id)
     return found
@@ -26,8 +24,8 @@ def inspect_message(message):
 
 async def main():
     print("Telegram Custom Emoji ID Extractor")
-    print("Send/forward a Telegram custom emoji to Saved Messages.")
-    print("The extractor will print every custom emoji document ID it sees.\n")
+    print("Send/forward a custom emoji to Saved Messages.")
+    print("The extractor prints the Telegram custom emoji document ID.\n")
 
     await client.start()
     me = await client.get_me()
@@ -49,5 +47,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    from telethon import events
     asyncio.run(main())
